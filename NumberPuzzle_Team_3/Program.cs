@@ -129,24 +129,7 @@ void down()
 TimeSpan delay = TimeSpan.FromMilliseconds(500);
 
 
-void Inicializar()
-{
-    Tablero = new byte[3, 3] { { 1, 2, 0 }, { 4, 6, 3 }, { 7, 5, 8 } };
 
-    nodos = new List<Nodo>();
-    generarTablero();
-    Nodo nodoInicial = new Nodo()
-    {
-        Estado = TableroToKey(Tablero),
-        Padre = null,
-        Costo = CalcularHeuristica(Tablero),
-        Heuristica = CalcularHeuristica(Tablero),
-        Pasos = 0
-    };
-    nodos.Add(nodoInicial);
-    generarNodos(nodoInicial);
-
-}
 
 
 //funciones
@@ -171,6 +154,19 @@ string TableroToKey(byte[,] tablero)
     return sb.ToString();
 }
 
+
+byte[,] KeyToTablero(string tablero)
+{
+    byte[,] result = new byte[3, 3];
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            result[i, j] = byte.Parse(tablero[i * 3 + j].ToString());
+    return result;
+}
+
+
+
+
 int CalcularHeuristica(byte[,] estado)
 {
     int heuristica =0;
@@ -192,24 +188,16 @@ int CalcularHeuristica(byte[,] estado)
 
 
 
-byte[,] KeyToTablero(string tablero)
-{
-    byte[,] result = new byte[3, 3];
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            result[i, j] = byte.Parse(tablero[i * 3 + j].ToString());
-    return result;
-}
 
-Nodo generarNodo(byte[,] estado, Nodo? padre, int heuristica, int pasos)
+Nodo generarNodo(byte[,] estado, Nodo? padre, int heuristica)
 {
     Nodo nodo = new Nodo()
     {
         Estado = TableroToKey(estado),
         Padre = padre,
-        Costo = heuristica + pasos,
+        Costo = heuristica + padre.Pasos+1,
         Heuristica = heuristica,
-        Pasos = pasos
+        Pasos = padre.Pasos + 1,
 
 
 
@@ -260,7 +248,7 @@ void generarNodos(Nodo padre)
         string key = TableroToKey(nuevoEstado);
         if (!nodos.Any(n => n.Estado == key))
         {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado), padre.Pasos + 1);
+            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
             nodos.Add(nuevoNodo);
         }
         else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
@@ -284,7 +272,7 @@ void generarNodos(Nodo padre)
         string key = TableroToKey(nuevoEstado);
         if (!nodos.Any(n => n.Estado == key))
         {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado), padre.Pasos + 1);
+            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
             nodos.Add(nuevoNodo);
         }
         else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
@@ -301,7 +289,7 @@ void generarNodos(Nodo padre)
         string key = TableroToKey(nuevoEstado);
         if (!nodos.Any(n => n.Estado == key))
         {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado), padre.Pasos + 1);
+            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
             nodos.Add(nuevoNodo);
         }
         else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
@@ -318,7 +306,7 @@ void generarNodos(Nodo padre)
         string key = TableroToKey(nuevoEstado);
         if (!nodos.Any(n => n.Estado == key))
         {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado), padre.Pasos + 1);
+            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
             nodos.Add(nuevoNodo);
         }
         else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
@@ -361,7 +349,24 @@ void generarNodos(Nodo padre)
 
 }
 
+void Inicializar()
+{
+    Tablero = new byte[3, 3] { { 1, 2, 0 }, { 4, 6, 3 }, { 7, 5, 8 } };
 
+    nodos = new List<Nodo>();
+    generarTablero();
+    Nodo nodoInicial = new Nodo()
+    {
+        Estado = TableroToKey(Tablero),
+        Padre = null,
+        Costo = CalcularHeuristica(Tablero),
+        Heuristica = CalcularHeuristica(Tablero),
+        Pasos = 0
+    };
+    nodos.Add(nodoInicial);
+    generarNodos(nodoInicial);
+
+}
 try
 {
     Inicializar();
