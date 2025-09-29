@@ -16,7 +16,7 @@ List<Nodo> nodos = new List<Nodo>();
 void generarTablero() {
     Random rand = new Random();
 
-    int ran = rand.Next(1,500);
+    int ran = rand.Next(1,100);
     for (int i = 0; i < ran; i++)
     {
         int direccion = rand.Next(4);
