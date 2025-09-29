@@ -8,11 +8,11 @@ namespace NumberPuzzle_Team_3.Models
 {
     public class Nodo
     {
-        string Estado;
-        Nodo? Padre;
-        int Costo;
-        int Heuristica;
-        int Pasos;
+        public string Estado;
+        public Nodo? Padre;
+        public int Costo;
+        public int Heuristica;
+        public int Pasos;
 
 
     }
