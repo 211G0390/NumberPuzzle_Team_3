@@ -139,7 +139,10 @@ void ImprimirTablero(byte[,] tablero)
     {
         for (int j = 0; j < tablero.GetLength(1); j++)
         {
+            Console.ForegroundColor = tablero[i, j] == 0 ? ConsoleColor.Red : ConsoleColor.White;
             Console.Write(tablero[i, j] + " ");
+            Console.ForegroundColor = ConsoleColor.White;
+
         }
         Console.WriteLine();
     }
