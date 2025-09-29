@@ -13,6 +13,7 @@ namespace NumberPuzzle_Team_3.Models
         public int Costo;
         public int Heuristica;
         public int Pasos;
+        public bool Visitado = false;
 
 
     }
