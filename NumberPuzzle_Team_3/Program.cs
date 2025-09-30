@@ -16,7 +16,7 @@ List<Nodo> nodos = new List<Nodo>();
 void generarTablero() {
     Random rand = new Random();
 
-    int ran = rand.Next(1,100);
+    int ran = rand.Next(1,500);
     for (int i = 0; i < ran; i++)
     {
         int direccion = rand.Next(4);
@@ -133,6 +133,27 @@ TimeSpan delay = TimeSpan.FromMilliseconds(500);
 
 
 //funciones
+
+//convierte el tablero a una cadena de texto
+string TableroToKey(byte[,] tablero)
+{
+    StringBuilder sb = new StringBuilder(9);
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            sb.Append(tablero[i, j]);
+    return sb.ToString();
+}
+
+//convierte una cadena de texto a un tablero
+byte[,] KeyToTablero(string tablero)
+{
+    byte[,] result = new byte[3, 3];
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            result[i, j] = byte.Parse(tablero[i * 3 + j].ToString());
+    return result;
+}
+//imprime el tablero en consola
 void ImprimirTablero(byte[,] tablero)
 {
     for (int i = 0; i < tablero.GetLength(0); i++)
@@ -148,28 +169,7 @@ void ImprimirTablero(byte[,] tablero)
     }
 }
 
-string TableroToKey(byte[,] tablero)
-{
-    StringBuilder sb = new StringBuilder(9);
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            sb.Append(tablero[i, j]);
-    return sb.ToString();
-}
-
-
-byte[,] KeyToTablero(string tablero)
-{
-    byte[,] result = new byte[3, 3];
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            result[i, j] = byte.Parse(tablero[i * 3 + j].ToString());
-    return result;
-}
-
-
-
-
+//calcula la heuristica del tablero
 int CalcularHeuristica(byte[,] estado)
 {
     int heuristica =0;
@@ -191,42 +191,57 @@ int CalcularHeuristica(byte[,] estado)
 
 
 
-
-Nodo generarNodo(byte[,] estado, Nodo? padre, int heuristica)
+//genera un nodo y lo agrega a la lista de nodos si no existe
+void generarNodo(byte[,] estado, Nodo? padre)
 {
-    Nodo nodo = new Nodo()
+
+    string key = TableroToKey(estado);
+    if (!nodos.Any(n => n.Estado == key))
     {
-        Estado = TableroToKey(estado),
-        Padre = padre,
-        Costo = heuristica + padre.Pasos+1,
-        Heuristica = heuristica,
-        Pasos = padre.Pasos + 1,
+        int heuristica = CalcularHeuristica(estado);
+        Nodo nodo = new Nodo()
+        {
+            Estado = TableroToKey(estado),
+            Padre = padre,
+            Costo = heuristica + padre.Pasos + 1,
+            Heuristica = heuristica,
+            Pasos = padre.Pasos + 1,
 
 
 
-    };
-    return nodo;
+        };
+        nodos.Add(nodo);
+    }
+    else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
+    {
+        //agregar aqui una parte recursiva para actualizar los nodos hijos
+        Nodo nodo1 = nodos.First(n => n.Estado == key);
+        nodo1.Padre = padre;
+        ActualizarNodosHijos(nodo1);
+    }
 }
 
+//actualiza los nodos hijos de un nodo en caso de que se haya encontrado un camino mas corto
 void ActualizarNodosHijos(Nodo nodo)
 {
+    nodo.Pasos= nodo.Padre != null ? nodo.Padre.Pasos + 1 : 0;
+    nodo.Costo= nodo.Heuristica + nodo.Pasos;
+
     var hijos = nodos.Where(n => n.Padre == nodo).ToList();
+
     foreach (var hijo in hijos)
     {
-        hijo.Costo = hijo.Heuristica + nodo.Pasos + 1;
-        hijo.Pasos = nodo.Pasos + 1;
+        hijo.Padre= nodo;
         ActualizarNodosHijos(hijo);
     }
 }
 
 
-
+//genera los nodos a partir de un nodo padre es el juego central
 void generarNodos(Nodo padre)
 {
     byte[,] estado = KeyToTablero(padre.Estado);
-    //System.Threading.Thread.Sleep(delay);
-    //Console.Clear();
-    //Console.WriteLine($"Costo: {padre.Costo}, Heuristica: {padre.Heuristica}, Pasos: {padre.Pasos}");
+   
     //ImprimirTablero(KeyToTablero(padre.Estado));
     padre.Visitado = true;
     //buscar 0
@@ -248,22 +263,8 @@ void generarNodos(Nodo padre)
         byte[,] nuevoEstado = (byte[,])estado.Clone();
         nuevoEstado[fila0, col0] = nuevoEstado[fila0 - 1, col0];
         nuevoEstado[fila0 - 1, col0] = 0;
-        string key = TableroToKey(nuevoEstado);
-        if (!nodos.Any(n => n.Estado == key))
-        {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
-            nodos.Add(nuevoNodo);
-        }
-        else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
-        {
+        generarNodo(nuevoEstado, padre);
 
-            ////nodo existente con mayor costo, actualizar;
-            //var nodoExistente = nodos.First(n => n.Estado == key);
-            //nodoExistente.Padre = padre;
-
-            //ActualizarNodosHijos(nodoExistente);
-            //agregar aqui una parte recursiva para actualizar los nodos hijos
-        }
 
     }
     //mover abajo
@@ -272,16 +273,10 @@ void generarNodos(Nodo padre)
         byte[,] nuevoEstado = (byte[,])estado.Clone();
         nuevoEstado[fila0, col0] = nuevoEstado[fila0 + 1, col0];
         nuevoEstado[fila0 + 1, col0] = 0;
-        string key = TableroToKey(nuevoEstado);
-        if (!nodos.Any(n => n.Estado == key))
-        {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
-            nodos.Add(nuevoNodo);
-        }
-        else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
-        {
-            //agregar aqui una parte recursiva para actualizar los nodos hijos
-        }
+
+        generarNodo(nuevoEstado, padre);
+
+        
     }
     //mover izquierda
     if (col0 > 0)
@@ -289,16 +284,9 @@ void generarNodos(Nodo padre)
         byte[,] nuevoEstado = (byte[,])estado.Clone();
         nuevoEstado[fila0, col0] = nuevoEstado[fila0, col0 - 1];
         nuevoEstado[fila0, col0 - 1] = 0;
-        string key = TableroToKey(nuevoEstado);
-        if (!nodos.Any(n => n.Estado == key))
-        {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
-            nodos.Add(nuevoNodo);
-        }
-        else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
-        {
-            //agregar aqui una parte recursiva para actualizar los nodos hijos
-        }
+        
+        generarNodo(nuevoEstado, padre);
+
     }
     //mover derecha
     if (col0 < 2)
@@ -306,28 +294,23 @@ void generarNodos(Nodo padre)
         byte[,] nuevoEstado = (byte[,])estado.Clone();
         nuevoEstado[fila0, col0] = nuevoEstado[fila0, col0 + 1];
         nuevoEstado[fila0, col0 + 1] = 0;
-        string key = TableroToKey(nuevoEstado);
-        if (!nodos.Any(n => n.Estado == key))
-        {
-            Nodo nuevoNodo = generarNodo(nuevoEstado, padre, CalcularHeuristica(nuevoEstado));
-            nodos.Add(nuevoNodo);
-        }
-        else if (nodos.Any(n => n.Estado == key && n.Pasos > padre.Pasos + 1))
-        {
-            //agregar aqui una parte recursiva para actualizar los nodos hijos
-        }
+        generarNodo(nuevoEstado, padre);
+
     }
 
     //elegir el nodo con menor costo
     Nodo? siguienteNodo = nodos.OrderBy(n => n.Costo).FirstOrDefault(x=>x.Visitado==false);
 
+    //verificar si es el correcto
     if (siguienteNodo != null && siguienteNodo.Heuristica > 0)
     {
+        // no se encontro la solucion aun asi que seguimos generando
         generarNodos(siguienteNodo);
     }
     else
     {
-       // Console.WriteLine("Solucion encontrada");
+        // Console.WriteLine("Solucion encontrada");
+        //imprimir la solucion
         List<Nodo> solucion = new List<Nodo>();
         Nodo? actual = siguienteNodo;
         while (actual != null)
@@ -354,8 +337,6 @@ void generarNodos(Nodo padre)
 
 void Inicializar()
 {
-    Tablero = new byte[3, 3] { { 1, 2, 0 }, { 4, 6, 3 }, { 7, 5, 8 } };
-
     nodos = new List<Nodo>();
     generarTablero();
     Nodo nodoInicial = new Nodo()
@@ -370,6 +351,8 @@ void Inicializar()
     generarNodos(nodoInicial);
 
 }
+
+
 try
 {
     Inicializar();
@@ -383,7 +366,5 @@ catch (Exception ex)
 
 
 
-
-Nodo nodo = new Nodo();
 
 Console.WriteLine("Hello, World!");
