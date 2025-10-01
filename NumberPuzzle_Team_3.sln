@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36518.9 d17.14
+VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumberPuzzle_Team_3", "NumberPuzzle_Team_3\NumberPuzzle_Team_3.csproj", "{49D83C8A-7CAE-4E92-B7F1-C6DFE4459D48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle_grafico", "Puzzle_grafico\Puzzle_grafico.csproj", "{7A97E1D9-58F2-4D8D-B9DB-08E2B3434912}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{49D83C8A-7CAE-4E92-B7F1-C6DFE4459D48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49D83C8A-7CAE-4E92-B7F1-C6DFE4459D48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49D83C8A-7CAE-4E92-B7F1-C6DFE4459D48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A97E1D9-58F2-4D8D-B9DB-08E2B3434912}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A97E1D9-58F2-4D8D-B9DB-08E2B3434912}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A97E1D9-58F2-4D8D-B9DB-08E2B3434912}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A97E1D9-58F2-4D8D-B9DB-08E2B3434912}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
