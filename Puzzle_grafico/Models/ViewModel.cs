@@ -36,6 +36,15 @@ namespace Puzzle_grafico.Models
             await InicializarAsync();
         }
 
+        [RelayCommand]
+        async Task MezclarAsync()
+        {
+            generarTablero();
+            await ImprimirTableroAsync(Tablero);
+
+
+        }
+
         void generarTablero()
         {
             Random rand = new Random();
@@ -318,8 +327,6 @@ namespace Puzzle_grafico.Models
         async Task InicializarAsync()
         {
             nodos = new List<Nodo>();
-            generarTablero();
-            await ImprimirTableroAsync(Tablero);
 
             Nodo nodoInicial = new Nodo()
             {
